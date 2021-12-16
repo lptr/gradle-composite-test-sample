@@ -1,0 +1,5 @@
+rootProject.name = 'CompositeBuildTestsDemo'
+
+include("app")
+
+includeBuild("modules/Module1")
