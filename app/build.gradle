@@ -19,3 +19,21 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+setUpDependencyTestExecution()
+
+// includes the tests for the sub projects unless there is a mechanism that filters for tests
+private void setUpDependencyTestExecution() {
+    // IntelliJ uses these to set up gradle runs with filtered tests, so we shouldn't run the included project tests
+    def isIntelliJTest = gradle.startParameter.initScripts.any { it.name.matches("ijtestinit.*\\.gradle") }
+
+    // someone is adding a filter to target certain tests, shouldn't run included project tests
+    def isManualTestFiltering = gradle.startParameter.taskRequests.args.flatten().contains("--tests")
+
+    if (!isManualTestFiltering && !isIntelliJTest) {
+        println "Including tests from dependencies"
+        test { dependsOn gradle.includedBuilds*.task(':test') }
+    } else {
+        println "Ignoring tests from dependencies"
+    }
+}
